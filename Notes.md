@@ -26,6 +26,9 @@ Okay; enough blabbering from me; let's get into the thick of it. THe basic build
 		w2 [shape=box];
 		w3 [shape=box];
 		w1 -> "F(wSum - T)" [label="input 1"]
+		w2 -> "F(wSum - T)" [label="input 2"]
+		w3 -> "F(wSum - T)" [label="input 3"]
+		"F(wSum - T)" -> "" [style=filled,color="1.0 1.0 1.0",label="result"]
 	}
 )
 
