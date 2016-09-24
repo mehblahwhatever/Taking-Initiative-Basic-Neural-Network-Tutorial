@@ -22,7 +22,10 @@ Okay; enough blabbering from me; let's get into the thick of it. THe basic build
 
 ![Perceptron](http://g.gravizo.com/g?
 	digraph G {
-		main -> parse;
+		w1 [shape=box];
+		w2 [shape=box];
+		w3 [shape=box];
+		w1 -> F(wSum - T) [label="input 1"]
 	}
 )
 
