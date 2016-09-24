@@ -20,17 +20,7 @@ Okay; enough blabbering from me; let's get into the thick of it. THe basic build
 
 **Note:** *perceptron - neuron that classifies its inputs into one of two categories, basically the output of a neuron is clamped to 1 or 0.*
 
-![Perceptron](http://g.gravizo.com/g?
-	digraph G {
-		w1 [shape=box];
-		w2 [shape=box];
-		w3 [shape=box];
-		w1 -> "F(wSum - T)" [label="input 1"]
-		w2 -> "F(wSum - T)" [label="input 2"]
-		w3 -> "F(wSum - T)" [label="input 3"]
-		"F(wSum - T)" -> result
-	}
-)
+![Perceptron](https://takinginitiative.files.wordpress.com/2008/03/perceptron.jpg?w=680)
 
 #### Basic neuron as a black box
 
