@@ -18,4 +18,35 @@ Now I haven't even told you what a Neural Network is and what it is used for. Si
 
 Okay; enough blabbering from me; let's get into the thick of it. THe basic building block of a NN is the neuron. The basic neuron is consisted of a black bo with weighted inputs and an output.
 
-***Note:** perception - neuron that classifies its inputs into one of two categories, basically the output of a neuron is clamped to 1 or 0.*
+**Note:** *perceptron - neuron that classifies its inputs into one of two categories, basically the output of a neuron is clamped to 1 or 0.*
+
+![Perceptron](http://g.gravizo.com/g?
+	digraph G {
+		main -> parse;
+	}
+)
+
+#### Basic neuron as a black box
+
+The black box section of the neuron consists of an activation function F(X), in our case its F(wSum - T) where the wSum is the weighted sum of the inputs and T is a threshold or bias value. We'll come back to the threshould value just now. The weights are initialized to some small random values and during training get updated. The weighted sum (wSum) is given below.
+
+```
+for(i=1; i<n; i++) {
+	wSum += weight[i] * input[i];
+}
+```
+
+Simple, huh? Now for the function F, there are various functions that can be used for F; the most common ones include the step function and the sigmoid function.  We will be using the sigmoid function in our BPN as its again the classical activation function. The sigmoid function and its derivative are defined as:
+
+```
+float sigmoid(float x) {
+	return 1 / (1 + pow(e, -1 * x));
+}
+```
+
+```
+float sigmoidDerivative(float x) {
+	return sigmoid(x) * (1 - sigmoid(x));
+}
+```
+
