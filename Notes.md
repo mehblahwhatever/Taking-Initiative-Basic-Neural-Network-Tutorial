@@ -142,7 +142,7 @@ void updateWeightsForHidden(float learningRate, HiddenNode *hiddenNodes, int inp
 	for(i = 0; i < inputCount; i++) {
 		for(j = 0; j < hiddenCount; j++) {
 			weightChange = learningRate * errorGradientForHidden(hiddenNodes[j]);
-			hiddenNodes[j]->inputWeights[i] = hiddenNodes[j]->inputWeights[i] + weightChange;
+			hiddenNodes[j]->inputWeights[i] += weightChange;
 		}
 	}
 }
@@ -154,7 +154,7 @@ void updateWeightsForOutput(float learningRate, OutputNode *outputNodes, int hid
 	for(i = 0; i < hiddenCount; i++) {
 		for(j = 0; j < outputCount; j++) {
 			weightChange = learningRate * errorGradientForOutput(outputNodes[j]);
-			outputNodes[j]->hiddenWeights[i] = outputNodes[j]->hiddenWeights[i] + weightChange;
+			outputNodes[j]->hiddenWeights[i] += weightChange;
 		}
 	}
 }
