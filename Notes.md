@@ -25,7 +25,7 @@ Okay; enough blabbering from me; let's get into the thick of it. THe basic build
 The black box section of the neuron consists of an activation function F(X), in our case its F(wSum - T) where the wSum is the weighted sum of the inputs and T is a threshold or bias value. We'll come back to the threshould value just now. The weights are initialized to some small random values and during training get updated. The weighted sum (wSum) is given below.
 
 ```cpp
-for(i=1; i < n; i++) {
+for(i = 0; i < n; i++) {
 	wSum += weight[i] * input[i];
 }
 ```
@@ -70,3 +70,112 @@ I'm not going to go into the details of how a neuron learns in detail or provide
 
 The learning rate term is a term that hasn't been mentioned before and is very important, it greatly affects the performance and accuracy of your network. I'll go over this in more detail once we get to the weight updates.
 
+### The Multilayer Neural Network
+
+As I mentioned before for linearly separable problems a single neuron is sufficient but what about problems that have more than one class or ones where data isn't so well separated like in the example below:
+
+![non-linearly separable dataset](https://takinginitiative.files.wordpress.com/2008/03/nlsds.jpg?w=680)
+
+Here we need at least two hyper-planes to solve this problem so we need 2 neurons. This requires us to link up these neurons together, to link them up we'll need shared inputs and outputs -- in other words: a multilayer neural network.  The standard architecture of a NN consists of 3 layers: an input layer, a hidden layer and an output layer.  THere are several proffs available that you will almost never need more than 3 layers (I'll try to get links to the papers soon) and allso more importantly we want to keep things simple.
+
+**NOTE**: you almost never know what your search space looks like, that's why you're using a neural network, often you'll have to experiment with the neural network architecture in regards to how many hidden neurals you need to get a good result.
+
+### A Basic Multilayer Neural Network:
+
+![Standard Architecture for a Back Propagation Neural Network](https://takinginitiative.files.wordpress.com/2008/03/bpn.jpg?w=490&h=277)
+
+Above is a basic multilayer neural network; the inputs are shared and so are the outputs; note that each of these links have separate weights.  Now what are those square blocks in the neural network? They are our thresholds (bias) values;  instead of having to store and update separate thresholds for each neuron (remember each neuron's activation function took a weighted sum minus a threshold as input), we simply create 2 extra neurons with a constant value of -1.  These neurons are then hooked up to the rest of the network and have their own weights  (these are technically the threshold values).
+
+This results in the weighted sum + the weight of the threshold multiplied by -1. Obviously, you can see itt's the same as we had earlier. Now when we update the weights for the network during back propagation we automatically update the thresholds as well, saving us a few calculations and headaches.
+
+Okay, so far, everything has (hopefully) been pretty simple, especially if you have a bit of a background in NNs or have read through an introductory chapter in an AI textbook. There are only 3 things left to discuss -- calculating the errors at the output, updating the weights (the back propagation) and the stopping conditions.
+
+The only control over this architecture you have is over the number of hidden neurons since your inputs and desired outputs are already known, so deciding on how many hidden neurons you need is often a tricky matter. Too many is never good, and neither is too little. Some careful experimentation will often be required to find out an optimal amount of hidden neurons.
+
+I'm not going to go over feeding the input forward, as it is really simple: all you do is calculate the output (the value of the activation function for the weighted sum of inputs) at a neuron and use it as the input for the next layer.
+
+### The Neuron Error Gradients
+
+Okay, so obviously, we need to update the weights in our neural network to give the correct output at the output layer. This forms the basis of training the neural network. We will make use of back-propagation for these weight updates. This just means input is fed in, the errors are calculated and filtered back through the network making changes to the weights to try to reduce the error.
+
+The weight changes are calculated using the gradient descent method. This means we follow the steepest path on the error function to try and minimize it. I'm not going to go into the math behind gradient descent, the error function, and so on, since it's not really needed. Simply put, al we're doing is just taking the error at the output neurons (Desired value - actual value) and multiplying it by the gradient of the sigmoid function. If the difference is positive, we need to move up the gradient of the activation funciton and if it's negative, we need to move down the gradient of the activation function.
+
+![Error: gradient - explanation](https://takinginitiative.files.wordpress.com/2008/04/errorgradientsexplanation.png?w=680)
+
+This is the formula to calculate the basic error gradient for each output neuron k:
+
+```cpp
+float errorGradientForOutput(&OutputNode node) {
+	return node->value * (1 - node->value) * (node->desiredValue - node->value);
+}
+```
+
+There is a difference between the error gradients at the output and hidden layers. The hidden layer's error gradient is based on the output layer's error gradient (back propagation) so for the hidden layer, the error gradient for each hidden neuron is the gradient of the activation function multiplied by the weighted sum of the errors at the output layer, originating from that neuron (wow, gettign a bit crazy here, eh?):
+
+```cpp
+float errorGradientForHidden(&HiddenNode node) {
+	float weightedSumOfErrors = 0f;
+	int i;
+
+	for(i = 0; i < node->outputsCount; i++) {
+		weightedSumOfErrors += node->outputWeights[i] * errorGradientForOutput(node->outputs[i]);
+	}
+
+	return node->value * (1 - node->value) * weightedSumOfErrors;
+}
+```
+
+### The Weight Update
+
+The final step in the algorithm is to update the weights. This occurs as follows:
+
+```cpp
+void updateWeights(float learningRate, HiddenNode *hiddenNodes, OutputNode *outputNodes, int inputCount, int hiddenCount, int outputCount) {
+	updateWeightsForHidden(learningRate, hiddenNodes, inputCount, hiddenCount);
+	updateWeightsForOutput(learningRate, outputNodes, hiddenCount, outputCount);
+}
+
+void updateWeightsForHidden(float learningRate, HiddenNode *hiddenNodes, int inputCount, int hiddenCount) {
+	float weightChange;
+	int i, j;
+
+	for(i = 0; i < inputCount; i++) {
+		for(j = 0; j < hiddenCount; j++) {
+			weightChange = learningRate * errorGradientForHidden(hiddenNodes[j]);
+			hiddenNodes[j]->inputWeights[i] = hiddenNodes[j]->inputWeights[i] + weightChange;
+		}
+	}
+}
+
+void updateWeightsForOutput(float learningRate, OutputNode *outputNodes, int hiddenCount, int outputCount) {
+	float weightChange;
+	int i, j;
+
+	for(i = 0; i < hiddenCount; i++) {
+		for(j = 0; j < outputCount; j++) {
+			weightChange = learningRate * errorGradientForOutput(outputNodes[j]);
+			outputNodes[j]->hiddenWeights[i] = outputNodes[j]->hiddenWeights[i] + weightChange;
+		}
+	}
+}
+```
+
+The alpha value you see above is the learning rate, this is usually a value between 0 and 1. It affects how large the weight adjustments are and so also affects the learning speed of the network. This value needs to be carfully selected to provide the best results. Too low, and it will take ages to learn; too high, and the adjustments might be too large and the accuracy will suffer as the network will constantly jump over a better solution and generally get stuck at some sub-optimal accuracy.
+
+### The Learning algorithm
+
+The BPN learns during a training epoch. You will probably go through several epochs before the network has sufficiently learned to handle all the data you've provided it and the end result is satisfactory. A training epoch is described below:
+
+*For each input entry in the training data set:*
+* feed input data in (feed forward)
+* check output against desired value and feed back error (back-propagate)
+
+*Where back-propagation consists of:*
+* calculate error gradients
+* update weights
+
+### Stopping Conditions
+
+These are some commonly used stopping conditions used for neural networks: desired accuracy, desired mean square error and elapsed epochs. I won't go over these in too much detail now, as I will be covering them in the next tutorial with some training examples. The main reasobnb I'm not going into detail here is that I haven't described the training of the network in detail. I need to go ovewr the creating of training data sets, what generalization and validation errors are and so on. All this will be covered in greater detail in the next tutorial.
+
+## Implementation
