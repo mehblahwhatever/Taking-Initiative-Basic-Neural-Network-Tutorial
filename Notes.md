@@ -179,3 +179,26 @@ The BPN learns during a training epoch. You will probably go through several epo
 These are some commonly used stopping conditions used for neural networks: desired accuracy, desired mean square error and elapsed epochs. I won't go over these in too much detail now, as I will be covering them in the next tutorial with some training examples. The main reasobnb I'm not going into detail here is that I haven't described the training of the network in detail. I need to go ovewr the creating of training data sets, what generalization and validation errors are and so on. All this will be covered in greater detail in the next tutorial.
 
 ## Implementation
+
+### Introduction & Implementation
+
+Okay, so how do we implement our neural network?  I'm not going to cover every aspect in great detail, since you can just look at my source code. I'm just going to go over the very basic architecture. So, what critical data storage do we need for our neural network?
+
+* Our neuron values
+* Our weights
+* Our weight changes
+* Our error gradients
+
+Now, I've seen various implementations and wait for it... here comes an OO rant: I don't understand why people feel the need to encapsulate everything in classes. The most common implementation of a neural network I've come across is the one where each neuron is modeled as an object and the neural network stores all these objects. Now explain to me the advantages of such an approach? All you're doing is wasting memory and code space. There is no sane reason to do this apart from trying to be super OO.
+
+The other common approach is to model each layer as an object? Again, what the hell are people smoking? I guess I can blame this on idiot professors that know the theory but can't code their way out of a paper bag. Like, for example, my father is a math's professor and is absolutely brilliant in regards to developing algorithms and just seeing elegant solutions to problems, but he cannot write code at all. I've had to convert his original discrete pulse transform Matlab code into c++, and in the process of conveting/optimizing it, I ended up developing a whole new approach and technique that wasn't possible to achieve directly from the maths -- the so called fast discrete pulse transform.
+
+I also tend to be a bit of a perfectionist, and am a firm believer in occam's razor (well, a modified version) -- "the simplest solution is usually the best solution". Okay, enough ranting -- the point is: don't use classes when you don't need to! Useless encapsulation is a terrible, terrible mistake, one that most college students make since it's drilled into them during their years of study!
+
+So, below is how I structured my neural network and as far as I know, it's as efficient as possible. If anyone can further optimize my implementation, please do! I'd love to see your techniques (I love learning how to make code faster).
+
+A neural network is a very simple thing and so must be implemented very simply. All the above values are just numbers so why can't I just use multi-dimensional arrays. The short answer is that I can, and I do. Storing each of those sets of numbers in multi-dimensional arrays is the most efficient and simplest way of doing it, with the added benefit that if you use the index variables i/j/k for input/hidden/output loops respectively, then your code will almost exactly resemble the formulas in the theory tutorial and in this one.
+
+So, now that the major architecture design decision has been mentioned, here's what the end result looks like;
+
+![console output from original author](https://takinginitiative.files.wordpress.com/2008/04/training.png?w=300&h=230)
